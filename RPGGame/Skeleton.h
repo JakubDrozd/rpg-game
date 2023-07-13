@@ -7,6 +7,9 @@ class Skeleton
 {
 private:
 	Texture texture;
+	RectangleShape boundingRectangle;
+
+	Vector2i size;
 
 public:
 	Sprite sprite;
@@ -14,7 +17,7 @@ public:
 public:
 	void load();
 	void initialize();
-	void update();
+	void update(float delta_time);
 	void draw(RenderWindow &window);
 };
 

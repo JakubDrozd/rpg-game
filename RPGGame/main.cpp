@@ -1,5 +1,7 @@
 #include "Player.h"
 #include "Skeleton.h"
+#include "Math.h"
+#include <iostream>
 
 using namespace sf;
 using namespace std;
@@ -12,14 +14,15 @@ int main(){
 
 	//-------------------------------------------- INIT ---------------------------------------------
 
-	player.initialize();
+	player.initialize();  
 	skeleton.initialize();
 
 	ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
 	RenderWindow window(VideoMode(1360, 768), "RPGGame", Style::Default, settings);
-	window.setFramerateLimit(60);
+
+	window.setFramerateLimit(144);
 
 
 	//-------------------------------------------- INIT ---------------------------------------------
@@ -29,7 +32,7 @@ int main(){
 	//-------------------------------------------- LOAD ---------------------------------------------
 
 
-
+	Clock clock;
 
 	//game loop (frame)
 	while (window.isOpen())
@@ -49,9 +52,15 @@ int main(){
 		{
 			window.close();
 		}
-		
-		skeleton.update();
-		player.update(skeleton);
+			
+		Time delta_time_raw = clock.restart();
+		float delta_time = delta_time_raw.asMilliseconds();
+		cout << delta_time << endl;
+
+		skeleton.update(delta_time);
+		player.update(skeleton, delta_time);
+
+
 		//--------------------------------------- UPDATE ---------------------------------------------
 
 

@@ -6,6 +6,11 @@ using namespace std;
 
 void Player::initialize()
 {
+	size = Vector2i(64, 64);
+
+	boundingRectangle.setFillColor(Color::Transparent);
+	boundingRectangle.setOutlineColor(Color::Red);
+	boundingRectangle.setOutlineThickness(1);
 }
 
 void Player::load()
@@ -17,9 +22,10 @@ void Player::load()
 
 		cout << "+++Player texture loaded+++" << endl;
 		sprite.setTexture(texture);
-		sprite.setTextureRect(IntRect(XIndex * 64, YIndex * 64, 64, 64));
+		sprite.setTextureRect(IntRect(XIndex * size.x, YIndex * size.y, size.x, size.y));
+		sprite.setPosition(Vector2f(0, 0));
 		sprite.scale(Vector2f(3, 3));
-		sprite.setPosition(Vector2f(1000, 400));
+		boundingRectangle.setSize(Vector2f(size.x * sprite.getScale().x, size.y * sprite.getScale().y));
 	}
 	else
 	{
@@ -27,46 +33,41 @@ void Player::load()
 	}
 }
 
-void Player::update(Skeleton& skeleton)
+void Player::update(Skeleton& skeleton, float delta_time)
 {
 
-	FloatRect bounds = sprite.getLocalBounds();
-	sprite.setOrigin(bounds.width / 2, bounds.height / 2);
-
-	float movement_speed = 8.0f;
 
 	if (Keyboard::isKeyPressed(Keyboard::D))
 	{
 		cout << "Moving right" << endl;
 		Vector2f curr_position = sprite.getPosition();
-		sprite.setPosition(curr_position + Vector2f(6.0f, 0));
-		sprite.setTextureRect(IntRect(1 * 64, 3 * 64, 64, 64));
+		sprite.setPosition(curr_position + Vector2f(1, 0) * speed *  delta_time);
+		sprite.setTextureRect(IntRect(1 * size.x, 3 * size.y, size.x, size.y));
 	}
 
 	if (Keyboard::isKeyPressed(Keyboard::A))
 	{
 		cout << "Moving left" << endl;
 		Vector2f curr_position = sprite.getPosition();
-		sprite.setPosition(curr_position + Vector2f(-movement_speed, 0));
-		sprite.setTextureRect(IntRect(1 * 64, 1 * 64, 64, 64));
+		sprite.setPosition(curr_position + Vector2f(-1, 0) * speed * delta_time);
+		sprite.setTextureRect(IntRect(1 * size.x, 1 * size.y, size.x, size.y));
 	}
 
 	if (Keyboard::isKeyPressed(Keyboard::S))
 	{
 		cout << "Moving down" << endl;
 		Vector2f curr_position = sprite.getPosition();
-		sprite.setPosition(curr_position + Vector2f(0, movement_speed));
-		sprite.setTextureRect(IntRect(0 * 64, 2 * 64, 64, 64));
+		sprite.setPosition(curr_position + Vector2f(0, 1) * speed * delta_time);
+		sprite.setTextureRect(IntRect(0 * size.x, 2 * size.y, size.x, size.y));
 	}
 
 	if (Keyboard::isKeyPressed(Keyboard::W))
 	{
 		cout << "Moving up" << endl;
 		Vector2f curr_position = sprite.getPosition();
-		sprite.setPosition(curr_position + Vector2f(0, -movement_speed));
-		sprite.setTextureRect(IntRect(0 * 64, 0 * 64, 64, 64));
+		sprite.setPosition(curr_position + Vector2f(0, -1) * speed * delta_time);
+		sprite.setTextureRect(IntRect(0 * size.x, 0 * size.y, size.x, size.y));
 	}
-
 
 
 	if (Mouse::isButtonPressed(Mouse::Button::Left))
@@ -84,7 +85,14 @@ void Player::update(Skeleton& skeleton)
 		Vector2f bullet_direction;
 		bullet_direction = skeleton.sprite.getPosition() - bullets[i].getPosition();
 		bullet_direction = Math::normalize_vector(bullet_direction);
-		bullets[i].setPosition(bullets[i].getPosition() + bullet_direction * bullet_speed);
+		bullets[i].setPosition(bullets[i].getPosition() + bullet_direction * bullet_speed * delta_time);
+	}
+
+	boundingRectangle.setPosition(sprite.getPosition());
+
+	if (Math::did_rect_collide(sprite.getGlobalBounds(), skeleton.sprite.getGlobalBounds()))
+	{
+		cout << "***Collision detected***" << endl;
 	}
 }
 
@@ -96,4 +104,6 @@ void Player::draw(RenderWindow &window)
 	{
 		window.draw(bullets[i]);
 	}
+
+	window.draw(boundingRectangle);
 }

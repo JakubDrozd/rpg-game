@@ -3,6 +3,16 @@
 
 using namespace std;
 
+void Skeleton::initialize()
+{
+	size = Vector2i(64, 64);
+
+	boundingRectangle.setFillColor(Color::Transparent);
+	boundingRectangle.setOutlineColor(Color::Cyan);
+	boundingRectangle.setOutlineThickness(1);
+
+}
+
 void Skeleton::load()
 {
 	if (texture.loadFromFile("Assets/Skeleton/Textures/spritesheet.png"))
@@ -12,9 +22,10 @@ void Skeleton::load()
 
 		cout << "+++Skeleton texture loaded+++" << endl;
 		sprite.setTexture(texture);
-		sprite.setTextureRect(IntRect(XIndex * 64, YIndex * 64, 64, 64));
-		sprite.scale(Vector2f(3, 3));
+		sprite.setTextureRect(IntRect(XIndex * size.x, YIndex * size.y, size.x, size.y));
 		sprite.setPosition(Vector2f(400, 400));
+		sprite.scale(Vector2f(3, 3));
+		boundingRectangle.setSize(Vector2f(size.x * sprite.getScale().x, size.y * sprite.getScale().y));
 	}
 	else
 	{
@@ -22,18 +33,13 @@ void Skeleton::load()
 	}
 }
 
-void Skeleton::initialize()
+void Skeleton::update(float delta_time)
 {
-}
-
-void Skeleton::update()
-{
-	FloatRect bounds = sprite.getLocalBounds();
-	sprite.setOrigin(bounds.width / 2, bounds.height / 2);
-
+	boundingRectangle.setPosition(sprite.getPosition());
 }
 
 void Skeleton::draw(RenderWindow &window)
 {
 	window.draw(sprite);
+	window.draw(boundingRectangle);
 }
